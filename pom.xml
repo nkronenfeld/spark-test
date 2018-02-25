@@ -31,38 +31,43 @@
       <version>${scala.version}</version>
     </dependency>
 
-    <!-- Spark -->
+    <!-- TODO: Figure out how to have two different produced jars, the standard one with
+         both spark-core and spark-sql test dependencies, and one labeled no-sql with just
+         spark-core test dependencies -->
+    <!-- Spark test jars -->
     <dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-core_${scala.compat.version}</artifactId>
 	    <version>${spark.version}</version>
 	    <type>test-jar</type>
-	    <scope>test</scope>
     </dependency>
     <dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-sql_${scala.compat.version}</artifactId>
 	    <version>${spark.version}</version>
-	    <scope>test</scope>
+    </dependency>
+    <dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-catalyst_${scala.compat.version}</artifactId>
+	    <version>${spark.version}</version>
     </dependency>
     <!-- Test dependencies are not transitive in Maven, so we have to manually include
-         both spark-sql and spark-catalyst's test jars -->
+         both spark-sql and spark-catalyst's test jars. -->
     <dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-sql_${scala.compat.version}</artifactId>
 	    <version>${spark.version}</version>
 	    <type>test-jar</type>
-	    <scope>test</scope>
     </dependency>
     <dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-catalyst_${scala.compat.version}</artifactId>
 	    <version>${spark.version}</version>
 	    <type>test-jar</type>
-	    <scope>test</scope>
     </dependency>
 
-    <!-- Test -->
+    <!-- We assume those who depend on us will depend on scalatest themselves; therefore
+         we leave scalatest with test scope. -->
     <dependency>
       <groupId>org.scalatest</groupId>
       <artifactId>scalatest_${scala.compat.version}</artifactId>
@@ -75,6 +80,20 @@
     <sourceDirectory>src/main/scala</sourceDirectory>
     <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
+	    <!-- enable scala -->
+	    <plugin>
+		    <groupId>net.alchim31.maven</groupId>
+		    <artifactId>scala-maven-plugin</artifactId>
+		    <version>3.2.2</version>
+		    <executions>
+			    <execution>
+				    <id>scala-test-compile-first</id>
+				    <goals>
+					    <goal>testCompile</goal>
+				    </goals>
+			    </execution>
+		    </executions>
+	    </plugin>
 	    <!-- enable scalatest -->
 	    <plugin>
 		    <groupId>org.scalatest</groupId>
@@ -83,7 +102,6 @@
 		    <configuration>
 			    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
 			    <junitxml>.</junitxml>
-			    <filereports>WDF TestSuite.txt</filereports>
 		    </configuration>
 		    <executions>
 			    <execution>
